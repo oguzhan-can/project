@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  #app'ten önce yazmamızın nedeni database ilk başta ayağa kaldırmak.
+  postgres:
+    image: postgres:latest
+    env_file:
+      - djangoProject/docker.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgresql-data:/var/lib/postgresql/data"
+    command: -p 5432
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #postgres tamamen ayağa kalkana kadar app birşey yapmıyor.
+    depends_on:
+      - postgres
+    env_file:
+      - djangoProject/docker.env
+    volumes:
+      - .:/srv/app
+    ports:
+      - "0.0.0.0:8000:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+
+
+
+volumes:
+  postgresql-data:
+  static-data:
